@@ -1,22 +1,22 @@
-import express from 'express';
-import cors from 'cors';
-import 'dotenv/config';
+import express from 'express'
+import cors from 'cors'
+import 'dotenv/config'
+import connectDB from './config/mongodb.js'
+import connectCloudinary from './config/cloudinary.js'
 
+// App Config
+const app = express()
+const port = process.env.PORT || 4000 
+connectDB()
+connectCloudinary()
 
-//App Config 
-
-const app = express();
-const port = process.env.PORT || 4000
-
-// MIddlewares 
-
+//Middlewares
 app.use(express.json())
 app.use(cors())
 
-//api endpoints 
-
+//Api Endpoints
 app.get('/',(req,res)=>{
-    res.send("API Working ");
-})
+    res.send("API Working ")
+});
 
-app.listen(port, ()=> console.log('server started on PORT :' +port))
+app.listen(port , ()=>console.log("Server Started on Port NO "+ port));
