@@ -42,7 +42,7 @@ const Collection = () => {
     if(subCategory.length > 0){
       productCopy = productCopy.filter (item => subCategory.includes(item.subCategory));
     }
-    setFilterProduct(productCopy)
+    setFilterProduct(productCopy )
   }
 
   const sortProduct = () => {
@@ -65,7 +65,7 @@ const Collection = () => {
 
   useEffect(() => {
     applyFilter()
-  }, [category,subCategory,search,showSearch]);
+  }, [category,subCategory,search,showSearch,products ]);
 
   useEffect(() => {
     sortProduct();
