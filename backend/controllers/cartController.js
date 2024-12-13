@@ -1,4 +1,4 @@
-import e from "express";
+import express from "express";
 import userModel from "../models/userModel.js";
 
 
