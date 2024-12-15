@@ -12,7 +12,6 @@ const List = ({token}) => {
 
       if(response.data.success){
         setList(response.data.products);
-        console.log(list)
       }
       else{
         toast.error(response.data.message)
