@@ -51,7 +51,11 @@ const Orders = () => {
           orderData.map((item,index)=>(
             <div key={index} className='py-4 border-t border-b text-gray-700 flex flex-col md:flex-row md:items-center justify-between gap-4' >
               <div className='flex items-start gap-6 text-sm ' >
-                <img src={item.image[0]} className='w-16 sm:w-20' alt="" />
+              {item.image && item.image[0] ? (
+                  <img src={item.image[0]} className='w-16 sm:w-20' alt={item.name} />
+                ) : (
+                  <div className="w-16 sm:w-20 bg-gray-200">No Image</div> // Fallback if no image
+                )}
                 <div>
                   <p className='sm:text-base font-medium' >{item.name}</p>
                   <div className='flex items-center gap-3 mt-2 text-base text-gray-700'>

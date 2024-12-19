@@ -1,10 +1,28 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import productModel from "../models/productModel.js";
 
 // Placing Orders using COD Method 
 const placeOrder = async (req,res) =>{
+    const session = await productModel.startSession();
+    session.startTransaction();
     try {
         const {userId,items,amount,address} = req.body;
+
+        for (const item of items) {
+            const product = await productModel.findById(item._id).session(session);
+            if (!product) {
+                throw new Error(`Product with ID ${item._id} not found`);
+            }
+
+            if (product.stock < item.quantity) {
+                throw new Error(`Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${item.quantity}`);
+            }
+
+            // Deduct stock
+            product.stock -= item.quantity;
+            await product.save({ session });
+        }
 
         const orderData = {
             userId,
@@ -21,6 +39,9 @@ const placeOrder = async (req,res) =>{
 
         await userModel.findByIdAndUpdate(userId,{cartData:{}})
         res.json({success:true,message:"Order Placed"})
+
+        await session.commitTransaction();
+        session.endSession();
 
 
     } catch (error) {
