@@ -22,6 +22,19 @@ const ShopContextProvider = (props) =>{
             toast.error('Select Product Size');
             return
         }
+
+        const product = products.find(item => item._id === itemId); // Find product
+        if (product) {
+            const stock = product.stock;
+            let cartData = structuredClone(cartItems);
+
+            const currentQuantity = cartData[itemId]?.[size] || 0;
+            if (currentQuantity + 1 > stock) {
+                toast.error(`Only ${stock} piece available in stock`); // Stock check
+                return;
+            }
+        }
+
         let cartData = structuredClone(cartItems);
 
         if(cartData[itemId]) {
@@ -65,8 +78,18 @@ const ShopContextProvider = (props) =>{
     }
 
     const updateQuantity = async(itemId,size,quantity) => {
+
+        const product = products.find(item => item._id === itemId); // Find product
+        if (product) {
+            const stock = product.stock;
+            if (quantity > stock) {
+                toast.error(`Only ${stock} ${product.name}(s) available in stock`); // Stock check
+                return;
+            }
+        }
+
         let cartData = structuredClone(cartItems);
-        cartData[itemId][size] =quantity;
+        cartData[itemId][size] = quantity;
         
         setCartItems(cartData);
         if(token){
