@@ -28,6 +28,19 @@ const Product = () => {
    fetchProductData();
   }, [productId,products]);
   
+  const renderStockMessage = () => {
+    const stock = productData.stock;
+
+    if (stock === 0) {
+      return <p className="text-red-600">Out of stock</p>;
+    } else if (stock === 1) {
+      return <p className="text-orange-500">Hurry! Only 1 left in stock.</p>;
+    } else if (stock <= 3) {
+      return <p className="text-emerald-500">Only a few left in stock!</p>;
+    } else {
+      return null; // No stock message for ample stock
+    }
+  };
   
 
   return productData ? (
@@ -69,7 +82,17 @@ const Product = () => {
                 ))}
               </div>
             </div>
-            <button onClick={()=>addToCart(productData._id,size)} className='bg-black text-white px-8 py-3 text-sm active:bg-gray-700' >ADD TO CART </button>
+            {/* Conditional rendering for Add to Cart and Stock Message */}
+            {productData.stock > 0 && (
+              <button
+                onClick={() => addToCart(productData._id, size,productData)}
+                className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
+              >
+                ADD TO CART
+              </button>
+            )}
+            <div className="mt-2">{renderStockMessage()}</div>
+            {/* <button onClick={()=>addToCart(productData._id,size)} className='bg-black text-white px-8 py-3 text-sm active:bg-gray-700' >ADD TO CART </button> */}
             <hr className='mt-8 sm:w-4/5' />
             <div className='text-sm text-gray-500 mt-3 flex flex-col gap-1 ' >
                 <p>100% Original Products </p>
