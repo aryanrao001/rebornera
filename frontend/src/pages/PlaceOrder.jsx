@@ -31,48 +31,54 @@ const PlaceOrder = () => {
 
   }
 
-  const onSubmitHandler = async(e)=>{
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
       let orderItems = [];
-      for(const items in cartItems){
-        for (const item in cartItems[items]){
-          if(cartItems[items][item]>0){
-            const itemInfo = structuredClone(products.find(product => product._id === items));
-            if(itemInfo){
-              itemInfo.size = item
-              itemInfo.quantity = cartItems[items][item]
+  
+      // Loop through cartItems and prepare the orderItems array
+      for (const itemId in cartItems) {
+        for (const size in cartItems[itemId]) {
+          if (cartItems[itemId][size] > 0) {
+            const itemInfo = structuredClone(products.find(product => product._id === itemId));
+            if (itemInfo) {
+              // Attach size and quantity to the itemInfo
+              itemInfo.size = size;
+              itemInfo.quantity = cartItems[itemId][size];
               orderItems.push(itemInfo);
             }
           }
         }
       }
-
+  
+      // Prepare the orderData
       let orderData = {
         address: formData,
         items: orderItems,
-        amount : getCartAmount() + delivery_fee
-      }
-
-      switch(method){
-        //Api calls for COD
+        amount: getCartAmount() + delivery_fee,
+ // Ensure you are passing the userId
+      };
+  
+      switch (method) {
         case 'cod':
-          const response = await axios.post(backendUrl + '/api/order/place',orderData,{headers:{token}});
-          if(response.data.success){
-            setCartItems({})
+          const response = await axios.post(backendUrl + '/api/order/place', orderData, { headers: { token } });
+          if (response.data.success) {
+            setCartItems({});
             navigate('/orders');
-          }else{
+          } else {
             toast.error(response.data.message);
           }
           break;
-
+  
+        // You can handle Stripe and Razorpay cases here similarly.
+        default:
+          break;
       }
-
     } catch (error) {
       console.log(error);
       toast.error(error.message);
     }
-  }
+  };
 
 
 

@@ -17,49 +17,49 @@ const ShopContextProvider = (props) =>{
     const [token, setToken] = useState('')
     const navigate = useNavigate();
 
-    const addToCart = async(itemId,size) => {
-        if(!size){
+    const addToCart = async (itemId, size) => {
+        if (!size) {
             toast.error('Select Product Size');
-            return
+            return;
         }
 
-        const product = products.find(item => item._id === itemId); // Find product
+        const product = products.find((item) => item._id === itemId); // Find product
         if (product) {
-            const stock = product.stock;
-            let cartData = structuredClone(cartItems);
+            const stockForSize = product.sizes.find((item) => item.size === size)?.quantity || 0; // Get the stock for the selected size
 
+            let cartData = structuredClone(cartItems);
             const currentQuantity = cartData[itemId]?.[size] || 0;
-            if (currentQuantity + 1 > stock) {
-                toast.error(`Only ${stock} piece available in stock`); // Stock check
+
+            if (currentQuantity + 1 > stockForSize) {
+                toast.error(`Only ${stockForSize} piece(s) of size ${size} available in stock`);
                 return;
             }
-        }
 
-        let cartData = structuredClone(cartItems);
-
-        if(cartData[itemId]) {
-            if(cartData[itemId][size]){
-                cartData[itemId][size] += 1;
-            }else{
+            // Add to cart
+            if (cartData[itemId]) {
+                if (cartData[itemId][size]) {
+                    cartData[itemId][size] += 1;
+                } else {
+                    cartData[itemId][size] = 1;
+                }
+            } else {
+                cartData[itemId] = {};
                 cartData[itemId][size] = 1;
             }
-        }else{
-            cartData[itemId] = {};
-            cartData[itemId][size] = 1
-        }
-        setCartItems(cartData);
 
-        if(token){
-            try {
-                await axios.post(backendUrl+'/api/cart/add',{itemId,size},{headers:{token}});
-                toast.success('Product Added')
+            setCartItems(cartData);
 
-            } catch (error) {
-                console.log(error)
-                toast.error(error.message);
+            if (token) {
+                try {
+                    await axios.post(backendUrl + '/api/cart/add', { itemId, size }, { headers: { token } });
+                    toast.success('Product Added');
+                } catch (error) {
+                    console.log(error);
+                    toast.error(error.message);
+                }
             }
         }
-    }
+    };
 
     const getCartCount = () => {
         let totalCount = 0 ;
@@ -77,27 +77,36 @@ const ShopContextProvider = (props) =>{
         return totalCount;
     }
 
-    const updateQuantity = async(itemId,size,quantity) => {
-
+    const updateQuantity = async (itemId, size, quantity) => {
         const product = products.find(item => item._id === itemId); // Find product
+    
         if (product) {
-            const stock = product.stock;
-            if (quantity > stock) {
-                toast.error(`Only ${stock} ${product.name}(s) available in stock`); // Stock check
+            const stockForSize = product.sizes.find(item => item.size === size)?.quantity || 0; // Find available stock for the selected size
+            
+            if (quantity > stockForSize) {
+                toast.error(`Only ${stockForSize} stock available for (${size}) size`); // Stock check for the selected size
                 return;
             }
         }
-
+    
         let cartData = structuredClone(cartItems);
-        cartData[itemId][size] = quantity;
-        
+    
+        // Ensure the updated quantity does not exceed the available stock
+        if (cartData[itemId] && cartData[itemId][size]) {
+            if (quantity > 0) {
+                cartData[itemId][size] = quantity; // Update the quantity
+            } else {
+                delete cartData[itemId][size]; // Remove the item if the quantity is zero
+            }
+        }
+    
         setCartItems(cartData);
-        if(token){
+    
+        if (token) {
             try {
-                await axios.post(backendUrl + '/api/cart/update',{itemId,size,quantity} , {headers:{token}});
-                
+                await axios.post(backendUrl + '/api/cart/update', { itemId, size, quantity }, { headers: { token } });
             } catch (error) {
-                console.log(error)
+                console.log(error);
                 toast.error(error.message);
             }
         }

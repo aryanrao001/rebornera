@@ -194,8 +194,8 @@ const Add = ({ token }) => {
 
       <div>
         <p className="mb-2">Product Sizes and Quantities</p>
-        <div className="flex flex-col md:flex-row gap-2">
-          {["S", "M", "L", "XL", "XXL","7","8","9","10","11"].map((size) => (
+        <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+          {["S", "M", "L", "XL", "XXL","3","4","5","6","7","8","9","10","11"].map((size) => (
             <div key={size} className="flex flex-col items-center">
               <p>{size}</p>
               <input

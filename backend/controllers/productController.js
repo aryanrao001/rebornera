@@ -3,7 +3,7 @@ import productModel from "../models/productModel.js"
 // Function for add product 
 const addProduct = async (req, res) => {
     try {
-        const { name, description, price, category, subCategory, sizes, bestseller } = req.body;
+        const { name, description, price, category, subCategory, sizes, bestseller , stock } = req.body;
 
         const image1 = req.files.image1 && req.files.image1[0];
         const image2 = req.files.image2 && req.files.image2[0];
@@ -28,11 +28,15 @@ const addProduct = async (req, res) => {
             parsedSizes = sizes.map((size) => ({ size, quantity: 0 })); // Default quantity to 0
         }
 
+        // Calculate total stock from sizes
+        const totalStock = parsedSizes.reduce((total, item) => total + (item.quantity || 0), 0);
+
         const productData = {
             name,
             description,
             category,
             price: Number(price),
+            stock: totalStock,
             subCategory,
             bestseller: bestseller === "true" ? true : false,
             sizes: parsedSizes, // Ensure sizes include both size and quantity
